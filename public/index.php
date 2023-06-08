@@ -3,17 +3,19 @@
 require 'header.php';
 include 'config.php';
 
-$_SESSION["mac"] = $_POST['mac'];
-$_SESSION["mac-esc"] = $_POST['mac-esc'];
-$_SESSION["ip"] = $_POST['ip'];
-$_SESSION["link-login"] = $_POST['link-login'];
-$_SESSION["link-login-only"] = $_POST['link-login-only'];
+if ($_POST['link-login']) {
+    $_SESSION["mac"] = $_POST['mac'];
+    $_SESSION["mac-esc"] = $_POST['mac-esc'];
+    $_SESSION["ip"] = $_POST['ip'];
+    $_SESSION["link-login"] = $_POST['link-login'];
+    $_SESSION["link-login-only"] = $_POST['link-login-only'];
 
-$_SESSION["user_type"] = "new";
-$error = $_POST['error'];
-
-
-# Checking DB to see if user exists or not.
+    $_SESSION["user_type"] = "new";
+    $error = $_POST['error'];
+} else {
+    http_response_code(403);
+    die('Forbidden');
+}
 
 mysqli_report(MYSQLI_REPORT_OFF);
 
@@ -28,9 +30,10 @@ PRIMARY KEY (`id`)
 )");
 
 
+# Checking DB to see if user exists or not.
 $result = $con->query(sprintf("SELECT * FROM `%s` WHERE mac='%s'", 
                               $table_name, 
-                              mysqli_real_escape_string($_SESSION[mac]))); 
+                              mysqli_real_escape_string($con, $_SESSION['mac']))); 
 
 if ($error == "" && $result->num_rows >= 1) {
   $row = mysqli_fetch_array($result);
