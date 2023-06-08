@@ -4,6 +4,7 @@ require 'header.php';
 include 'config.php';
 
 $mac = $_SESSION["mac"];
+$mac_esc = $_SESSION["mac-esc"];
 $ip = $_SESSION["ip"];
 $link_login = $_SESSION["link-login"];
 $link_login_only = $_SESSION["link-login-only"];
@@ -11,26 +12,14 @@ $linkorig = "https://www.google.com";
 
 $last_updated = date("Y-m-d H:i:s");
 
-$username="admin";
+$username="guest";
 
-$fname = $_POST['fname'];
-$lname = $_POST['lname'];
-$email = $_POST['email'];
 
-if ($_SESSION["user_type"] == "new") {
-    mysqli_query($con, "
-    CREATE TABLE IF NOT EXISTS `$table_name` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `firstname` varchar(45) NOT NULL,
-    `lastname` varchar(45) NOT NULL,
-    `email` varchar(45) NOT NULL,
-    `mac` varchar(45) NOT NULL,
-    `ip` varchar(45) NOT NULL,
-    `last_updated` varchar(45) NOT NULL,
-    PRIMARY KEY (`id`)
-    )");
-
-    mysqli_query($con,"INSERT INTO `$table_name` (firstname, lastname, email, mac, ip, last_updated) VALUES ('$fname', '$lname', '$email', '$mac', '$ip', '$last_updated')");
+if ($_SESSION["user_type"] == "new") {  
+    $email = $_POST['email'];
+    $stmt = mysqli_prepare($con,"INSERT INTO `$table_name` (email, mac, ip, last_updated) VALUES (?,?,?,?)");
+    $stmt->bind_params("ssss",$email, $mac, $ip, $last_updated);
+    $stmt->execute();
 }
 
 mysqli_close($con);
@@ -62,8 +51,8 @@ mysqli_close($con);
     <div class="main">
         <seection class="section">
             <div class="container">
-                <div id="margin_zero" class="content has-text-centered is-size-6">Please wait, you are being</div>
-                <div id="margin_zero" class="content has-text-centered is-size-6">authorized on the network</div>
+                <div id="margin_zero" class="content has-text-centered is-size-6">Por favor espere,</div>
+                <div id="margin_zero" class="content has-text-centered is-size-6">está autorizando en la red</div>
             </div>
         </seection>
     </div>
@@ -71,29 +60,17 @@ mysqli_close($con);
 </div>
 
 <script type="text/javascript">
-    function doLogin() {
-        document.sendin.username.value = document.login.username.value;
-        document.sendin.password.value = hexMD5('\011\373\054\364\002\233\266\263\270\373\173\323\234\313\365\337\356');
-        document.sendin.submit();
-        return false;
-    }
-</script>
-<script type="text/javascript">
     function formAutoSubmit () {
-        var frm = document.getElementById("login");
         document.getElementById("login").submit();
-        frm.submit();
     }
-    // window.onload = formAutoSubmit;
-    window.onload = setTimeout(formAutoSubmit, 2500);
+    window.onload = setTimeout(formAutoSubmit, 500);
 
 </script>
 
-<form id="login" method="post" action="<?php echo $link_login_only; ?>" onSubmit="return doLogin()">
+<form id="login" method="POST" action="<?php echo $link_login_only; ?>">
     <input name="dst" type="hidden" value="<?php echo $linkorig; ?>" />
-    <input name="popup" type="hidden" value="false" />
     <input name="username" type="hidden" value="<?php echo $username; ?>"/>
-    <input name="password" type="hidden"/>
+    <input name="password" type="hidden" value=""/>
 </form>
 
 </body>

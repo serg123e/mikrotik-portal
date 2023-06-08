@@ -4,26 +4,38 @@ require 'header.php';
 include 'config.php';
 
 $_SESSION["mac"] = $_POST['mac'];
+$_SESSION["mac-esc"] = $_POST['mac-esc'];
 $_SESSION["ip"] = $_POST['ip'];
 $_SESSION["link-login"] = $_POST['link-login'];
 $_SESSION["link-login-only"] = $_POST['link-login-only'];
 
 $_SESSION["user_type"] = "new";
+$error = $_POST['error'];
+
 
 # Checking DB to see if user exists or not.
 
 mysqli_report(MYSQLI_REPORT_OFF);
-$result = mysqli_query($con, "SELECT * FROM `$table_name` WHERE mac='$_SESSION[mac]'");
 
-if ($result->num_rows >= 1) {
+$con->query("CREATE TABLE IF NOT EXISTS `$table_name` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`email` varchar(45) NOT NULL,
+`mac` varchar(45) NOT NULL,
+`ip` varchar(45) NOT NULL,
+`last_updated` DATETIME NOT NULL,
+INDEX (`mac`),
+PRIMARY KEY (`id`)
+)");
+
+
+$result = $con->query(sprintf("SELECT * FROM `%s` WHERE mac='%s'", 
+                              $table_name, 
+                              mysqli_real_escape_string($_SESSION[mac]))); 
+
+if ($error == "" && $result->num_rows >= 1) {
   $row = mysqli_fetch_array($result);
-
-  mysqli_close($con);
-
   $_SESSION["user_type"] = "repeat";
   header("Location: welcome.php");
-} else {
-  mysqli_close($con);
 }
 
 ?>
@@ -53,27 +65,13 @@ if ($result->num_rows >= 1) {
     </div>
 
     <div class="main">
-        <section class="section">
+        <section class="section"><?php if ($error != "") { ?>
+            <div><?php echo $error; ?></div>
+            <?php } ?>
             <div class="container">
-                <div id="contact_form" class="content is-size-5 has-text-centered has-text-weight-bold">Enter your details
+                <div id="contact_form" class="content is-size-5 has-text-centered has-text-weight-bold">Entrar detalles
                 </div>
                 <form method="post" action="connect.php">
-                    <div class="field">
-                        <div class="control has-icons-left">
-                            <input class="input" type="text" id="form_font" name="fname" placeholder="First Name" required>
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-user"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control has-icons-left">
-                            <input class="input" type="text" id="form_font" name="lname" placeholder="Last Name" required>
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-user"></i>
-                            </span>
-                        </div>
-                    </div>
                     <div class="field">
                         <div class="control has-icons-left">
                             <input class="input" type="email" id="form_font" name="email" placeholder="Email" required>
@@ -84,16 +82,22 @@ if ($result->num_rows >= 1) {
                     </div>
                     <br>
                     <div class="columns is-centered is-mobile">
+                        <div class="policy">
+                        <?php include 'policy.php'; ?>
+                        <br>
                         <div class="control">
                             <label class="checkbox">
                                 <input type="checkbox" required>
-                                I agree to the <a href="policy.php">Terms of Use</a>
+                                Estoy de acuerdo con los <a href="condiciones.php">Condiciones de uso</a>
                             </label>
                         </div>
+
+                        </div>
+
                     </div>
                     <br>
                     <div class="buttons is-centered">
-                        <button class="button is-link">Connect</button>
+                        <button class="button is-link">Conectar</button>
                     </div>
                 </form>
             </div>

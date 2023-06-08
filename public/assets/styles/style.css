@@ -49,6 +49,14 @@ a:link
   margin: 0;
 }
 
+div.policy
+{
+    width: 90%;
+    height: 200px;
+    overflow:scroll;
+}
+
+
 /* Media Query for iPads */
 
 @media only screen 
@@ -74,3 +82,5 @@ and (min-width: 768px)
     height: 80%;
   }
 }
+
+
