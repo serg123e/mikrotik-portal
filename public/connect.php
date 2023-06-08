@@ -4,7 +4,6 @@ require 'header.php';
 include 'config.php';
 
 $mac = $_SESSION["mac"];
-$mac_esc = $_SESSION["mac-esc"];
 $ip = $_SESSION["ip"];
 $link_login = $_SESSION["link-login"];
 $link_login_only = $_SESSION["link-login-only"];
@@ -18,7 +17,7 @@ $username="guest";
 if ($_SESSION["user_type"] == "new") {  
     $email = $_POST['email'];
     $stmt = mysqli_prepare($con,"INSERT INTO `$table_name` (email, mac, ip, last_updated) VALUES (?,?,?,?)");
-    $stmt->bind_params("ssss",$email, $mac, $ip, $last_updated);
+    $stmt->bind_param("ssss",$email, $mac, $ip, $last_updated);
     $stmt->execute();
 }
 
@@ -44,7 +43,7 @@ mysqli_close($con);
     <div class="head">
         <br>
         <figure id="logo">
-            <img src="assets/images/logo.png">
+            <img src="assets/images/acerko_logo_512x172_01_blue.png">
         </figure>
     </div>
 
