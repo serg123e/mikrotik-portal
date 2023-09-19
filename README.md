@@ -39,3 +39,19 @@ It has been successfully tested with `RouterOS v7.4.1`
 ## Mikrotik Hotspot Login file
 
 Add your domain to `login.html` in action field and upload it to Mikrotik router in Files => Hotspot folder.
+
+## Flowchart
+
+```mermaid
+flowchart TD
+    A[Usuario] -->|Connected to Wi-Fi| B(Redirects to portal web page)
+    B --> M{MAC exists in DB?}
+    M -->|Si| W[welcome.php: welcome again]
+    W --> C[connect.php]
+    M -->|No| INDEX[Main page]
+    INDEX --> TOS[Asking email and confirm TOS]
+    TOS --> F{email valid and TOS accepted?}
+    F --> |No| INDEX
+    F --> |Si| C
+    C --> MT[Authorizing access in mikrotik]
+```
